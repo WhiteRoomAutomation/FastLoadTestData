@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Configuration>
+<FASTLOAD>
+	<TEMPDIR>C:\Temp</TEMPDIR>
+	<FLDIR>C:\FL_Temp</FLDIR>	
+  <STARTDATE>2021-01-01</STARTDATE>
+  <ENDDATE>2021-12-31</ENDDATE>
+  <WINDOWSIZE>6000</WINDOWSIZE>
+</FASTLOAD>
+</Configuration>

@@ -10,6 +10,8 @@ namespace FastLoadTestData
     {
         static void Main(string[] args)
         {
+            FastLoadSimManager myManager = new FastLoadSimManager();
+            myManager.GenerateData();
         }
     }
 }
