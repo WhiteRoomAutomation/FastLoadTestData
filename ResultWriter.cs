@@ -15,52 +15,55 @@ namespace FastLoadTestData
         public string strFL = "";
 
 
-        public bool WriteData()
+        async public void WriteData()
         {
-            bool bReturn = false;
 
-            ResultList.Sort();
-            try
+            await Task.Run(() =>
             {
-                DateTime dtCurr = DateTime.Now;
-                string strflOutput = strTemp + "\\" + dtCurr.ToString("yyyyMMddHHmmssFFFFFFF") + ".csv";
-                //MessageBox.Show(strflOutput);
-                System.IO.StreamWriter swFL = new System.IO.StreamWriter(strflOutput);
-                swFL.WriteLine("ASCII");
-                swFL.WriteLine(",");
-                swFL.WriteLine("Administrator,1,Server Local,10,0");
 
-                foreach (FastLoadData OutputRow in ResultList)
-                {
-                    swFL.WriteLine(OutputRow.GetExportString());
-                }
-                System.Threading.Thread.Sleep(1);
-
-                swFL.Flush();
-                swFL.Close();
-
-                ResultList.Clear();
-                ResultList.TrimExcess();
-
-                string fileName = System.IO.Path.GetFileName(strflOutput);
-
-                string destFile = System.IO.Path.Combine(strFL, fileName);
-
+                ResultList.Sort();
                 try
                 {
+                    DateTime dtCurr = DateTime.Now;
+                    string strflOutput = strTemp + "\\" + Guid.NewGuid() + ".csv";
+                    //MessageBox.Show(strflOutput);
+                    System.IO.StreamWriter swFL = new System.IO.StreamWriter(strflOutput);
+                    swFL.WriteLine("ASCII");
+                    swFL.WriteLine(",");
+                    swFL.WriteLine("Administrator,1,Server Local,10,0");
 
-                    System.IO.File.Move(strflOutput, destFile);
+                    foreach (FastLoadData OutputRow in ResultList)
+                    {
+                        swFL.WriteLine(OutputRow.GetExportString());
+                    }
+                    System.Threading.Thread.Sleep(1);
+
+                    swFL.Flush();
+                    swFL.Close();
+
+                    ResultList.Clear();
+                    ResultList.TrimExcess();
+
+                    string fileName = System.IO.Path.GetFileName(strflOutput);
+
+                    string destFile = System.IO.Path.Combine(strFL, fileName);
+
+                    try
+                    {
+
+                        System.IO.File.Move(strflOutput, destFile);
+                    }
+                    catch (Exception exCopy)
+                    {
+                        logger.Error("Error while copying file {0}: {1} ", fileName, exCopy.Message);
+                    }
                 }
-                catch (Exception exCopy)
+                catch (Exception ex)
                 {
-                    logger.Error("Error while copying file {0}: {1} ",fileName, exCopy.Message);
+                    logger.Error("Error while writing: {0}", ex.Message);
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error while writing: {0}",ex.Message);
-            }
-            return bReturn;
+            });
+            
         }
     }
 }

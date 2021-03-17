@@ -112,7 +112,7 @@ namespace FastLoadTestData
                         results.ResultList.Add(dataItem);
 
 
-                        logger.Info("{0},{1},{2}", row["TagName"], row["Value"], row["TimeStamp"]);
+                        //logger.Info("{0},{1},{2}", row["TagName"], row["Value"], row["TimeStamp"]);
                     }
 
                     results.WriteData();
