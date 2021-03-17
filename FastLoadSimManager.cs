@@ -114,7 +114,7 @@ namespace FastLoadTestData
                         FastLoadData dataItem = new FastLoadData();
                         dataItem.dtDate = System.Convert.ToDateTime(row["TimeStamp"]);
                         dataItem.strTagName = System.Convert.ToString(row["TagName"]);
-                        dataItem.strQuality = System.Convert.ToString(r.Next(0, 192));
+                        dataItem.strQuality = "192";
                         dataItem.strValue = System.Convert.ToString(row["Value"]);
                         Writers.Last().ResultList.Add(dataItem);
 
