@@ -8,6 +8,7 @@ using System.IO;
 using System.Data;
 
 using System.Data.SqlClient;
+using Tedd.RandomUtils;
 
 namespace FastLoadTestData
 {
@@ -76,11 +77,18 @@ namespace FastLoadTestData
                 dt.Columns.Add("Value", System.Type.GetType("System.Double"));
                 dt.Columns.Add("TimeStamp", System.Type.GetType("System.DateTime"));
 
-                
 
-                
 
-                for (DateTime dtWindowStart = dtStart; dtWindowStart < dtEnd; dtWindowStart = dtWindowStart.AddSeconds(iWindowSize))
+                List<ResultWriter> Writers = new List<ResultWriter>();
+                Writers.Add(new ResultWriter());
+                Writers.Last().strFL = szFLPath;
+                Writers.Last().strTemp = szTempPath;
+
+
+                Tedd.RandomUtils.FastRandom r = new Tedd.RandomUtils.FastRandom();
+
+
+                for (DateTime dtWindowStart = dtStart; dtWindowStart <= dtEnd; dtWindowStart = dtWindowStart.AddSeconds(iWindowSize))
                 {
                     DataTable dtTemp = dt.Copy() ;
                     DateTime dtWindowEnd = dtWindowStart.AddSeconds(iWindowSize);
@@ -90,16 +98,15 @@ namespace FastLoadTestData
                     }
 
 
-                    Random r = new Random();
-                   
+                    
+                    
                    
                     dtTemp.Columns["Value"].Expression = System.Convert.ToString(r.NextDouble() * 200000 - 100000);
                     dtTemp.Columns["TimeStamp"].Expression = dtWindowStart.ToString("#yyyy-MM-dd HH:mm:ss.fff#");
 
 
-                    ResultWriter results = new ResultWriter();
-                    results.strFL = szFLPath;
-                    results.strTemp = szTempPath;
+                    
+                    
                     
 
                     foreach (DataRow row in dtTemp.Rows)
@@ -109,19 +116,30 @@ namespace FastLoadTestData
                         dataItem.strTagName = System.Convert.ToString(row["TagName"]);
                         dataItem.strQuality = System.Convert.ToString(r.Next(0, 192));
                         dataItem.strValue = System.Convert.ToString(row["Value"]);
-                        results.ResultList.Add(dataItem);
+                        Writers.Last().ResultList.Add(dataItem);
 
 
                         //logger.Info("{0},{1},{2}", row["TagName"], row["Value"], row["TimeStamp"]);
                     }
+                    if (Writers.Last().ResultList.Count >= 10000000)
+                    {
+                        logger.Info("Writing to file {0}", dtWindowStart);
+                        Writers.Last().WriteData();
+                        Writers.Add(new ResultWriter());
+                        Writers.Last().strFL = szFLPath;
+                        Writers.Last().strTemp = szTempPath;
+                        logger.Info("New Writer Ready");
 
-                    results.WriteData();
-
-
-
+                    }
 
                 }
-                
+
+                if (Writers.Last().ResultList.Count > 0)
+                {
+                    Writers.Last().WriteData();
+                }
+               
+
             }
             catch (Exception exLoad)
             {
